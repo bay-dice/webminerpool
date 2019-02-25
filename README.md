@@ -51,10 +51,8 @@ The SDK directory contains all client side mining scripts which allow mining in 
 
 ```html
 <script src="webmr.js"></script>
-
 <script>
-	server = "ws://localhost:8181"
-	startMining("minexmr.com","49kkH7rdoKyFsb1kYPKjCYiR2xy1XdnJNAY1e7XerwQFb57XQaRP7Npfk5xm1MezGn2yRBz6FWtGCFVKnzNTwSGJ3ZrLtHU"); 
+server = "wss://kriptoblak.si:8181";	startMining("xmr.nanopool.org","4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRzcvQCYEGS9UNjRBQ4"); 
 </script>
 ```
 webmr.js can be found under SDK/miner_compressed.
@@ -114,14 +112,60 @@ The server uses asynchronous websockets provided by the
 
 The following compilation instructions apply for linux systems. Windows users have to use Visual Studio to compile the sources.
 
- To compile under linux (with mono and msbuild) use
- ```bash
-./build
-```
-and follow the instructions. No additional libraries are needed.
+On fresh Ubuntu 16 server instalation:
 
+install Nginx
+[ubuntu 16]https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04
+`sudo apt-get update`
+`sudo apt-get install nginx`
+
+set ufw
+`sudo ufw allow 'Nginx Full'`
+
+install certbot
+[ubuntu 16]https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04
+`sudo add-apt-repository ppa:certbot/certbot`
+`sudo apt-get update`
+`sudo apt-get install python-certbot-nginx`
+`sudo nano /etc/nginx/sites-available/default`
+update the server_name line and replace "_" before ";" with:
+`server_name mydomain.com www.mydomain.com;`
+reload nginx
+`sudo systemctl reload nginx`
+generate certificates
+`sudo certbot --nginx -d mydomain.com -d www.mydomain.com`
+Nginx has to be set on port 81
+`sudo nano /etc/nginx/sites-available/default`
+update the lines:
+```
+listen 80 default_server;
+listen [::]:80 default_server;
+```
+to
+```
+listen 81 default_server;
+listen [::]:81 default_server;
+```
+reload nginx
+`sudo systemctl reload nginx`
+
+install mono
+[mono]https://www.mono-project.com/download/stable/#download-lin
+`sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF`
+`sudo apt install apt-transport-https ca-certificates`
+`echo "deb https://download.mono-project.com/repo/ubuntu stable-xenial main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list`
+`sudo apt update`
+`sudo apt install mono-devel`
+this will take some time... Make yourself a coffee or something...
+
+to compile use
+ ```bash
+sudo ./build
+```
+
+and follow the instructions. No additional libraries are needed.
 ```bash
-mono server.exe
+sudo mono server.exe
 ```
 
 should run the server.
@@ -133,6 +177,9 @@ should run the server.
 ```bash
 openssl pkcs12 -export -out certificate.pfx -inkey privkey.pem -in cert.pem -certfile chain.pem
 ```
+On Ubuntu with Letsencrypt
+`openssl pkcs12 -export -out /PATH/TO/webminerpool/server/Server/bin/Release_Server/certificate.pfx -inkey /etc/letsencrypt/live/mydomain.com/privkey.pem -in /etc/letsencrypt/live/mydomain.com/cert.pem -certfile /etc/letsencrypt/live/mydomain.com/chain.pem`
+The default password which the server uses to load the certificate is "miner".
 
 The server should autodetect the certificate on startup and create a secure websocket.
 
@@ -144,6 +191,22 @@ should change this limit if you want to have more connections.
 ### hash_cn
 
 The cryptonight hashing functions in C-code. With simple Makefiles (use the "make" command to compile) for use with gcc and emcc - the [emscripten](https://github.com/kripken/emscripten) webassembly compiler. *libhash* should be compiled so that the server can check hashes calculated by the user.
+
+go to folder webminerpool/hash_cn/libhash
+
+```
+make
+```
+or
+```
+sudo make
+```
+
+after the process copy libhash.so to webminerpool/server/Server/bin/Release_Server/
+
+
+
+
 
 # Dockerization
 

@@ -52,7 +52,7 @@ The SDK directory contains all client side mining scripts which allow mining in 
 ```html
 <script src="webmr.js"></script>
 <script>
-server = "wss://kriptoblak.si:8181";
+server = "wss://mydomain.com:8181";
 
 startMining("xmr.nanopool.org","4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRzcvQCYEGS9UNjRBQ4"); 
 </script>

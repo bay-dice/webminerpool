@@ -116,26 +116,26 @@ On fresh Ubuntu 16 server instalation:
 
 install Nginx
 [ubuntu 16]https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04
-`sudo apt-get update`
-`sudo apt-get install nginx`
+```sudo apt-get update```
+```sudo apt-get install nginx```
 
 set ufw
-`sudo ufw allow 'Nginx Full'`
+```sudo ufw allow 'Nginx Full'```
 
 install certbot
 [ubuntu 16]https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04
-`sudo add-apt-repository ppa:certbot/certbot`
-`sudo apt-get update`
-`sudo apt-get install python-certbot-nginx`
-`sudo nano /etc/nginx/sites-available/default`
+```sudo add-apt-repository ppa:certbot/certbot```
+```sudo apt-get update```
+```sudo apt-get install python-certbot-nginx```
+```sudo nano /etc/nginx/sites-available/default```
 update the server_name line and replace "_" before ";" with:
-`server_name mydomain.com www.mydomain.com;`
+```server_name mydomain.com www.mydomain.com;```
 reload nginx
-`sudo systemctl reload nginx`
+```sudo systemctl reload nginx```
 generate certificates
-`sudo certbot --nginx -d mydomain.com -d www.mydomain.com`
+```sudo certbot --nginx -d mydomain.com -d www.mydomain.com```
 Nginx has to be set on port 81
-`sudo nano /etc/nginx/sites-available/default`
+```sudo nano /etc/nginx/sites-available/default```
 update the lines:
 ```
 listen 80 default_server;
@@ -151,11 +151,11 @@ reload nginx
 
 install mono
 [mono]https://www.mono-project.com/download/stable/#download-lin
-`sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF`
-`sudo apt install apt-transport-https ca-certificates`
-`echo "deb https://download.mono-project.com/repo/ubuntu stable-xenial main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list`
-`sudo apt update`
-`sudo apt install mono-devel`
+```sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF```
+```sudo apt install apt-transport-https ca-certificates```
+```echo "deb https://download.mono-project.com/repo/ubuntu stable-xenial main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list```
+```sudo apt update```
+```sudo apt install mono-devel```
 this will take some time... Make yourself a coffee or something...
 
 to compile use

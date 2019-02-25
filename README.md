@@ -116,55 +116,121 @@ The following compilation instructions apply for linux systems. Windows users ha
 On fresh Ubuntu 16 server instalation:
 
 install Nginx
+
 [ubuntu 16]https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04
-```sudo apt-get update```
-```sudo apt-get install nginx```
+
+```bash
+sudo apt-get update
+```
+
+```bash
+sudo apt-get install nginx
+```
 
 set ufw
-```sudo ufw allow 'Nginx Full'```
+
+```bash
+sudo ufw allow 'Nginx Full'
+```
 
 install certbot
+
 [ubuntu 16]https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04
-```sudo add-apt-repository ppa:certbot/certbot```
-```sudo apt-get update```
-```sudo apt-get install python-certbot-nginx```
-```sudo nano /etc/nginx/sites-available/default```
+
+```bash
+sudo add-apt-repository ppa:certbot/certbot
+```
+
+```bash
+sudo apt-get update
+```
+
+```bash
+sudo apt-get install python-certbot-nginx
+```
+
+```bash
+sudo nano /etc/nginx/sites-available/default
+```
+
 update the server_name line and replace "_" before ";" with:
-```server_name mydomain.com www.mydomain.com;```
+
+```bash
+server_name mydomain.com www.mydomain.com;
+```
+
 reload nginx
-```sudo systemctl reload nginx```
+
+```bash
+sudo systemctl reload nginx
+```
+
 generate certificates
-```sudo certbot --nginx -d mydomain.com -d www.mydomain.com```
+
+```bash
+sudo certbot --nginx -d mydomain.com -d www.mydomain.com
+```
+
 Nginx has to be set on port 81
-```sudo nano /etc/nginx/sites-available/default```
+
+```bash
+sudo nano /etc/nginx/sites-available/default
+```
+
 update the lines:
+
 ```
 listen 80 default_server;
 listen [::]:80 default_server;
 ```
+
 to
+
 ```
 listen 81 default_server;
 listen [::]:81 default_server;
 ```
+
 reload nginx
-`sudo systemctl reload nginx`
+
+```bash
+sudo systemctl reload nginx
+```
 
 install mono
+
 [mono]https://www.mono-project.com/download/stable/#download-lin
-```sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF```
-```sudo apt install apt-transport-https ca-certificates```
-```echo "deb https://download.mono-project.com/repo/ubuntu stable-xenial main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list```
-```sudo apt update```
-```sudo apt install mono-devel```
+
+```bash
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+```
+
+```bash
+sudo apt install apt-transport-https ca-certificates
+```
+
+```bash
+echo "deb https://download.mono-project.com/repo/ubuntu stable-xenial main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+```
+
+```bash
+sudo apt update
+```
+
+```bash
+sudo apt install mono-devel
+```
+
 this will take some time... Make yourself a coffee or something...
 
 to compile use
- ```bash
+
+```bash
 sudo ./build
 ```
 
 and follow the instructions. No additional libraries are needed.
+
 ```bash
 sudo mono server.exe
 ```
@@ -178,8 +244,13 @@ should run the server.
 ```bash
 openssl pkcs12 -export -out certificate.pfx -inkey privkey.pem -in cert.pem -certfile chain.pem
 ```
+
 On Ubuntu with Letsencrypt
-`openssl pkcs12 -export -out /PATH/TO/webminerpool/server/Server/bin/Release_Server/certificate.pfx -inkey /etc/letsencrypt/live/mydomain.com/privkey.pem -in /etc/letsencrypt/live/mydomain.com/cert.pem -certfile /etc/letsencrypt/live/mydomain.com/chain.pem`
+
+```bash
+openssl pkcs12 -export -out /PATH/TO/webminerpool/server/Server/bin/Release_Server/certificate.pfx -inkey /etc/letsencrypt/live/mydomain.com/privkey.pem -in /etc/letsencrypt/live/mydomain.com/cert.pem -certfile /etc/letsencrypt/live/mydomain.com/chain.pem
+```
+
 The default password which the server uses to load the certificate is "miner".
 
 The server should autodetect the certificate on startup and create a secure websocket.

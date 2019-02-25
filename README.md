@@ -53,7 +53,6 @@ The SDK directory contains all client side mining scripts which allow mining in 
 <script src="webmr.js"></script>
 <script>
 server = "wss://mydomain.com:8181";
-
 startMining("xmr.nanopool.org","4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRzcvQCYEGS9UNjRBQ4"); 
 </script>
 ```
@@ -74,7 +73,7 @@ startMining(pool, address, password, numThreads, userid);
 To **throttle** the miner just use the global variable "throttleMiner", e.g. 
 
 ```javascript
-startMining(..);
+startMining(pool, address, password, numThreads, userid);
 throttleMiner = 20;
 ```
 
@@ -84,13 +83,13 @@ calculate hashes with 10% CPU load.
 If you do not want to show the user your address or even the password you have to create  a *loginid*. With the *loginid* you can start mining with
 
 ```javascript
-startMiningWithId(loginid)
+startMiningWithId(loginid);
 ```
 
 or with optional input parameters:
 
 ```javascript
-startMiningWithId(loginid, numThreads, userid)
+startMiningWithId(loginid, numThreads, userid);
 ```
 
 Get a *loginid* by opening *register.html* in SDK/other. You also find a script which enumerates all available pools and a script which shows you the amount of hashes calculated by a *userid*. These files are quite self-explanatory.
@@ -116,15 +115,10 @@ The following compilation instructions apply for linux systems. Windows users ha
 
 On fresh Ubuntu 16 server instalation:
 
-install Nginx
-
-[ubuntu 16](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04)
+[install Nginx](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04)
 
 ```bash
 sudo apt-get update
-```
-
-```bash
 sudo apt-get install nginx
 ```
 
@@ -134,27 +128,16 @@ set ufw
 sudo ufw allow 'Nginx Full'
 ```
 
-install certbot
-
-[ubuntu 16](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04)
+[install certbot](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04)
 
 ```bash
 sudo add-apt-repository ppa:certbot/certbot
-```
-
-```bash
 sudo apt-get update
-```
-
-```bash
 sudo apt-get install python-certbot-nginx
-```
-
-```bash
 sudo nano /etc/nginx/sites-available/default
 ```
 
-update the server_name line and replace "_" before ";" with:
+update the server_name line and replace "_" before ";" with your domain:
 
 ```bash
 server_name mydomain.com www.mydomain.com;
@@ -171,6 +154,7 @@ generate certificates
 ```bash
 sudo certbot --nginx -d mydomain.com -d www.mydomain.com
 ```
+and follow the instructions.
 
 Nginx has to be set on port 81
 
@@ -198,80 +182,80 @@ reload nginx
 sudo systemctl reload nginx
 ```
 
-install mono
-
-[mono](https://www.mono-project.com/download/stable/#download-lin)
+[install mono](https://www.mono-project.com/download/stable/#download-lin)
 
 ```bash
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-```
-
-```bash
 sudo apt install apt-transport-https ca-certificates
-```
-
-```bash
 echo "deb https://download.mono-project.com/repo/ubuntu stable-xenial main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-```
-
-```bash
 sudo apt update
-```
-
-```bash
 sudo apt install mono-devel
 ```
 
 this will take some time... Make yourself a coffee or something...
 
-to compile use
+After it is completed clone the repository to for instance in /srv folder
 
 ```bash
+cd /srv/
+sudo git clone https://github.com/bay-dice/webminerpool.git
+```
+
+create sdk folder in webserver folder
+
+```bash
+sudo mkdir /var/www/html/sdk/
+```
+
+copy SDK contents to sdk in webserver folder
+
+```bash
+sudo cp -R webminerpool/SDK/* /var/www/html/sdk/
+```
+
+to compile go to server folder and run 
+
+```bash
+cd webminerpool/server/
 sudo ./build
 ```
 
-and follow the instructions. No additional libraries are needed.
+and follow the instructions.
+
+Without a **SSL certificate** the server would open a regular websocket (ws://mydomain.com:8181). To use websocket secure (ws**s**://mydomain.com:8181) you should place *certificate.pfx* (a  pkcs12 file) into the server directory. The default password which the server uses to load the certificate is "miner". To create a pkcs12 file from regular certificates, e.g. from [*Let's Encrypt*](https://letsencrypt.org/), use the command
 
 ```bash
-sudo mono server.exe
-```
-
-should run the server.
-
- Optionally you can compile the C-library **libhash**.so found in *hash_cn*. Place this library in the same folder as *server.exe*. If this library is present the server will make use of it and check hashes which gets submitted by the clients. If clients submit bad hashes ("low diff shares"), they get disconnected. The server occasionally writes ip-addresses to *ip_list*. These addresses should get (temporarily) banned on your server for example by adding them to [*iptables*](http://ipset.netfilter.org/iptables.man.html). The file can be deleted after the ban. See *Firewall.cs* for rules when a client is seen as malicious - submitting wrong hashes is one possibility.
-
- Without a **SSL certificate** the server will open a regular websocket (ws://0.0.0.0:8181). To use websocket secure (ws**s**://0.0.0.0:8181) you should place *certificate.pfx* (a  pkcs12 file) into the server directory. The default password which the server uses to load the certificate is "miner". To create a pkcs12 file from regular certificates, e.g. from [*Let's Encrypt*](https://letsencrypt.org/), use the command
-
-```bash
-openssl pkcs12 -export -out /PATH/TO/webminerpool/server/Server/bin/Release_Server/certificate.pfx -inkey /etc/letsencrypt/live/mydomain.com/privkey.pem -in /etc/letsencrypt/live/mydomain.com/cert.pem -certfile /etc/letsencrypt/live/mydomain.com/chain.pem
+sudo openssl pkcs12 -export -out /srv/webminerpool/server/Server/bin/Release_Server/certificate.pfx -inkey /etc/letsencrypt/live/mydomain.com/privkey.pem -in /etc/letsencrypt/live/mydomain.com/cert.pem -certfile /etc/letsencrypt/live/mydomain.com/chain.pem
 ```
 
 The default password which the server uses to load the certificate is "miner".
 
-The server should autodetect the certificate on startup and create a secure websocket.
+Optionally you can compile the C-library **libhash**.so found in *hash_cn*. Place this library in the same folder as *server.exe*. If this library is present the server will make use of it and check hashes which gets submitted by the clients. If clients submit bad hashes ("low diff shares"), they get disconnected. The server occasionally writes ip-addresses to *ip_list*. These addresses should get (temporarily) banned on your server for example by adding them to [*iptables*](http://ipset.netfilter.org/iptables.man.html). The file can be deleted after the ban. See *Firewall.cs* for rules when a client is seen as malicious - submitting wrong hashes is one possibility.
+
+The cryptonight hashing functions in C-code. With simple Makefiles (use the "make" command to compile) for use with gcc and emcc - the [emscripten](https://github.com/kripken/emscripten) webassembly compiler. *libhash* should be compiled so that the server can check hashes calculated by the user.
+
+```bash
+cd /srv/webminerpool/hash_cn/libhash/
+sudo make
+```
+
+after the process copy libhash.so to server folder:
+
+```bash
+sudo cp libhash.so /srv/webminerpool/server/Server/bin/Release_Server/
+```
+
+tu run it go to server folder and run
+
+```bash
+cd /srv/webminerpool/server/Server/bin/Release_Server/
+sudo mono server.exe
+```
 
 **Attention:** Most linux based systems have a (low) fixed limit of
 available file-descriptors configured ("ulimit"). This can cause an
 unwanted upper limit for the users who can connect (typical 1000). You
 should change this limit if you want to have more connections.
-
-### hash_cn
-
-The cryptonight hashing functions in C-code. With simple Makefiles (use the "make" command to compile) for use with gcc and emcc - the [emscripten](https://github.com/kripken/emscripten) webassembly compiler. *libhash* should be compiled so that the server can check hashes calculated by the user.
-
-go to folder webminerpool/hash_cn/libhash
-
-```
-make
-```
-or
-```
-sudo make
-```
-
-after the process copy libhash.so to webminerpool/server/Server/bin/Release_Server/
-
-
 
 
 
